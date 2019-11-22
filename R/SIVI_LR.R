@@ -1,3 +1,10 @@
+######################
+# including some packages
+library(tensorflow)
+library(pracma)
+
+
+######################
 
 slim = tf$contrib$slim
 Exponential = tf$contrib$distributions$Exponential(rate=1.0)
@@ -42,6 +49,11 @@ y_test = as.integer(drop(matdata['y_test']))
 #transforming the labels of data for the logistic regression
 y_train[y_train == 0] = -1
 y_test[y_test == 0] = -1
+
+###################################
+#Stored Mean-field and MCMC results
+theta_mf = t(matdata['Beta_VB_sample'])
+theta_mcmc = t(matdata['BetaMCMC'])
 
 ###################################
 
@@ -130,9 +142,30 @@ theta_hive = matrix(0, 1000, P)
 for (i in 1:1000) {
   r = sess$run(z_sample)
   theta_hive[i,] = r[0,]
+}
+
 
 ####################################
 
-
+evaluate = function(theta, X_test, y_test) {
+  M = dim(theta)[1]
+  n_test = length(test)
+  prob = matrix(0, n_test, M)
+  blr = matrix(0, n_test, M)
+  for (t in 1:M) {
+    coff = rowSums(-1*(repmat(theta[t, ], n_test, 1) %*% X_test))
+    blr[, t] = rep(1, n_test)/(1 + exp(coff))
+    coff1 = y_test %*% rowSums(-1*(repmat(theta[t, ], n_test, 1)) %*% X_test)
+    prob[, t] = rep(1, n_test) / (1 + exp(coff1))
+  }
+  prob = rowMeans(prob)
+  scatter.smooth(rowMeans(blr), rowMeans(blr))
+  return(list("mean" = rowMeans(blr), "std" = apply(blr, 1, std)))
 }
+
+evaluate(theta_mcmc, X_test, y_test)
+evaluate(theta_hive, X_test, y_test)
+
+
+####################################
 
