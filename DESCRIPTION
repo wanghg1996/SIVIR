@@ -1,13 +1,13 @@
 Package: SIVIR
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: SEMI-IMPLICIT VARIATIONAL INFERENCE
+Version: 1.0.0.0000
 Authors@R: 
     person(given = "Honggang",
            family = "Wang",
            role = c("aut", "cre"),
            email = "honggang@stat.tamu.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: This package mainly load one function "sivi_lr", which runs the sivi alorithm in the logistic regression scenario.
 License: GLP-3
 Encoding: UTF-8
 LazyData: true
