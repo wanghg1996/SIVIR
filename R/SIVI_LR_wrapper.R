@@ -1,6 +1,4 @@
 #####################
-tf$reset_default_graph()
-
 
 Exponential = tf$contrib$distributions$Exponential(rate=1.0)
 Normal = tf$contrib$distributions$Normal(loc=0., scale=1.)
@@ -43,7 +41,6 @@ samplelr_hyper <- function(noise_dim, K, z_dim, reuse = F) {
 #' @param n_iter the whole iteration number
 #' @param inner_iter the iteration number for the nural network which reside in the inner part of the iteration and is supposed to be smaller than the iter_num.
 #' @param pos_num the sampling numbers of the posterior
-#' @param merge when merge equals one means using the lower bound, when it equals zero means using the upper bound
 #' @param lr the learning rate inside the 200 times iteration
 #' @param lr2 the learning rate outside the 200 times iteration
 #'
@@ -51,9 +48,22 @@ samplelr_hyper <- function(noise_dim, K, z_dim, reuse = F) {
 #' @export
 #'
 #' @examples sivi_lr(waveform$X.train, waveform$y.train)
-sivi_lr <- function(X, Y, noise_dim = 20, K = 50, J = 100, merge = 1, lr = 0.0001, lr2 = 0.01,
+sivi_lr <- function(X, Y, noise_dim = 20, K = 50, J = 100, lr = 0.0001, lr2 = 0.01,
                     n_iter = 500, inner_iter = 200, pos_num = 1000) {
+  # resetting the tensorflows graph first
+
+  tf$reset_default_graph()
+
   # Compatibility check
+  if(!is.matrix(X)){
+    if(is.vector(X)){
+      X = as.matrix(X, length(X), 1)
+    }else
+    {
+      stop("the X need to be matrix or vector form.")
+    }
+  }
+
   if(dim(X)[1] != length(Y)){
     stop("the dimension of x and y are not compitible")
   }
@@ -73,7 +83,7 @@ sivi_lr <- function(X, Y, noise_dim = 20, K = 50, J = 100, merge = 1, lr = 0.000
   noise_dim = as.integer(noise_dim)
   K = as.integer(K)
   J = as.integer(J)
-  merge = as.integer(merge)
+  merge = as.integer(1)
   lr = tf$constant(lr)
   lr2 = tf$constant(lr2)
   alpha = 0.01
