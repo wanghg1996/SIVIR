@@ -35,7 +35,11 @@ sivi_lr(X, Y, noise_dim = 20, K = 50, J = 100, merge = 1,
 the sampling of posterior for the latent variables
 }
 \description{
-SIVI for Logistic Regression
+This function is used for the implementation of the SIVI's algorithm (semi-implicit variational inference) in the
+logistic regression set-up. It adopts the adam optimizer for the covariance matrix and uses the gradient descent optimizer for
+the Neural Network in the implicit part. The iter number can be tuned manually, and the output is the sampling from the posterior
+of the latent variables. In this configuration, we have the number of latent variables equal to the numbers of parameters input
+by X.
 }
 \examples{
 sivi_lr(waveform$X.train, waveform$y.train)
