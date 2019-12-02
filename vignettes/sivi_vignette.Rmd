@@ -17,3 +17,43 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(SIVIR)
 ```
+
+This package aims at using the SIVI in the logistic regression setup. This algorithm is brought up to solve the degenarcy phenomenon in the posterior in the mean-field case, which introduce some extra terms to modify the lower and upper bound, making the new surrogate converging to the ELBO on both side. This alorithm comes from (Mingzhang Y., Mingyuan Z. 2018)(http://proceedings.mlr.press/v80/yin18b/yin18b.pdf).
+
+This package include a waveform dataset which can be used as a testing dataset. For explaining clearly how to use this package and the funciton sivi_lr, we first extract the training part from the dataset.
+```{r}
+x = waveform$X.train
+y = waveform$y.train
+```
+
+Then we can run the sivi_lr function on the dataset with all the default parameters and then we can make some change for the parameters. As the training goes on, the function will print the average loss and standerd deviation for the loss
+```{r}
+result = sivi_lr(x, y)
+```
+
+Let's see the form of the output, it is a list which contains the sampling from the posterior of the latent variables. For convenience, the dim of latent variables is determined by the input dimension of X.
+```{r}
+pos = result$sample_pos
+dim(pos)
+```
+
+The function contains many tunable parameters such as the iteration number, the learning rate, the number of modified terms, the sampling numbers of latent space while calculating and so on. Here we try to tune some of them and we can see the result for each of them.
+```{r}
+result = sivi_lr(x, y, noise_dim = 35)
+```
+
+Also we can change some other parts.
+```{r}
+result = sivi_lr(x, y, K = 500, J = 1000)
+```
+
+```{r}
+result = sivi_lr(x, y, n_iter = 2000, inner_iter = 800)
+```
+
+```{r}
+result = sivi_lr(x, y, pos_num = 2000)
+dim(result$sample_pos)
+```
+
+From above testing, we can see that as the increasing of the K and J the convergence of the posterior gets better than before which we can see through observing the loss value and standerd deviation. We can also see that with the increasing of the iteration, the loss continues to decrease. All the output from above perfectly testified the result we predict through the model from the paper. So from the above testing, we can deduce that the fucntion sivi_lr works well as expected.
