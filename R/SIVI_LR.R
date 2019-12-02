@@ -37,9 +37,9 @@ samplelr_hyper <- function(noise_dim, K, z_dim, reuse=False) {
 ###################################
 # Loading the data for testing the model into X_train, x_test, y_train, y_test.
 
-path = "data path"
+path = "waveform"
 
-matdata = read.csv(path)
+matdata = data(path)
 
 X_train = matdata['X_train']
 X_test = matdata['X_test']
@@ -66,7 +66,7 @@ J = tf$placeholder(tf$int32)
 
 fff = tf$get_variable("z", dtype = tf$float32,
                       initializer = tf$zeros(((P+1)*P/2)+0.2))
-chol_cov = fill_triangular(fff)
+chol_cov = tf$contrib$distributions$fill_triangular(fff)
 covariance = tf$matmul(chol_cov, tf$transpose(chol_cov))
 
 inv_cov = tf$matrix_inverse(covariance)
@@ -121,15 +121,15 @@ sess$run(init_op)
 
 record = numeric()
 
-for (i in 1:5000) {
+for (i in 1:500) {
   result = sess$run(list(train_op1, loss), dict(x = X_train, y = y_train, lr = 0.01*(0.9**(i/100)), J = as.integer(100), merge = as.interger(1), scale = 1.0))
 
-  if(i < 2000) {
+  if(i < 200) {
     result = sess$run(list(train_op2, loss), dict(x = X_train, y = y_train, lr2 = 0.001*(0.9**(i/100)), J = as.integer(100), merge = as.integer(1), scale = 1.0))
 
     record = append(record, result[[2]])
   }
-  if(i %% 100) {
+  if(i %% 10) {
     cat("iter:", i+1, "cost=", mean(record), ',', std(record))
     record = numeric()
   }
